@@ -29,8 +29,8 @@ No manual steps, no configuration headaches — just run and go.
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/chunghieu1/auto-snipeit-installer.git
-cd auto-snipeit-installer
+git clone https://github.com/chunghieu1/snipeit-installer.git
+cd snipeit-installer
 ```
 
 ### 2. Run the installation script
