@@ -52,7 +52,7 @@ This script will:
 If you prefer not to clone the repository, you can run the script directly:
 
 ```bash
-bash <(wget -qO- https://raw.githubusercontent.com/chunghieu1/snipeit-installer/refs/heads/main/setup_snipeit.sh)
+bash <(wget -qO- https://raw.githubusercontent.com/chunghieu1/snipeit-installer/main/setup_snipeit.sh)
 ```
 
 ### 4. Access Snipe-IT
