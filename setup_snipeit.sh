@@ -2,42 +2,43 @@
 
 set -e
 
-# Get public IP address of VPS
+# Get VPS IP
 IP=$(hostname -I | awk '{print $1}')
 
-# Remove needrestart to avoid upgrade interruptions
-apt remove -y needrestart >/dev/null 2>&1 || true
-rm -f /etc/needrestart/needrestart.conf >/dev/null 2>&1 || true
+echo -e "Removing needrestart to avoid upgrade interruptions..."
+sudo apt remove -y needrestart || true
+sudo rm -f /etc/needrestart/needrestart.conf
 
-# Disable automatic service restarts during unattended-upgrades
-sed -i 's/^#\?Unattended-Upgrade::Automatic-Reboot.*/Unattended-Upgrade::Automatic-Reboot "false";/' /etc/apt/apt.conf.d/50unattended-upgrades >/dev/null 2>&1 || true
+echo -e "Disabling unattended-upgrades automatic service restarts..."
+sudo sed -i 's/^#\?Unattended-Upgrade::Automatic-Reboot.*/Unattended-Upgrade::Automatic-Reboot "false";/' /etc/apt/apt.conf.d/50unattended-upgrades || true
 
-# System update and upgrade (fully non-interactive)
-apt update -y >/dev/null 2>&1
-DEBIAN_FRONTEND=noninteractive \
+echo -e "Updating system packages..."
+sudo apt update
+sudo DEBIAN_FRONTEND=noninteractive \
   apt upgrade -y \
   -o Dpkg::Options::="--force-confdef" \
-  -o Dpkg::Options::="--force-confold" >/dev/null 2>&1
+  -o Dpkg::Options::="--force-confold"
 
-# Install Docker and Docker Compose
-apt install -y ca-certificates curl gnupg lsb-release >/dev/null 2>&1
-mkdir -p /etc/apt/keyrings >/dev/null 2>&1
+echo -e "Installing Docker and Docker Compose..."
+sudo apt install -y ca-certificates curl gnupg lsb-release
+
+sudo mkdir -p /etc/apt/keyrings
 curl -fsSL https://download.docker.com/linux/$(. /etc/os-release && echo "$ID")/gpg | \
-  gpg --dearmor -o /etc/apt/keyrings/docker.gpg >/dev/null 2>&1
+  sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 
 echo \
   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
   https://download.docker.com/linux/$(. /etc/os-release && echo "$ID") \
-  $(lsb_release -cs) stable" > /etc/apt/sources.list.d/docker.list
+  $(lsb_release -cs) stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
-apt update -y >/dev/null 2>&1
-apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin >/dev/null 2>&1
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
-# Create working directory
-mkdir -p ~/snipeit_docker >/dev/null 2>&1
+echo -e "Creating snipeit_docker directory and docker-compose.yml..."
+mkdir -p ~/snipeit_docker
 cd ~/snipeit_docker
 
-# Generate docker-compose.yml
 cat > docker-compose.yml <<'EOF'
 volumes:
   db_data:
@@ -75,7 +76,7 @@ services:
       retries: 5
 EOF
 
-# Generate .env file with IP injected into APP_URL
+echo -e "Generating .env file..."
 cat > .env <<EOF
 APP_VERSION=
 APP_PORT=80
@@ -191,5 +192,7 @@ LDAP_MEM_LIM=500M
 LDAP_TIME_LIM=600
 EOF
 
-# Start container silently
-docker compose up -d >/dev/null 2>&1
+echo -e "Starting Docker Compose..."
+sudo docker compose up -d
+
+echo -e "Done! Access your Snipe-IT at: http://$IP"
