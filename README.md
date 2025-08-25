@@ -71,3 +71,11 @@ Replace `your-server-ip` with the public IP address of your server.
 
 - Ensure your server meets the requirements before running the script.
 - For troubleshooting or customization, refer to the script comments or the [Snipe-IT documentation](https://snipeitapp.com/docs).
+
+---
+
+## License
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
